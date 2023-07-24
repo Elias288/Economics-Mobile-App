@@ -1,4 +1,4 @@
-# app
+# Economics Mobile App
 
 A new Flutter project.
 

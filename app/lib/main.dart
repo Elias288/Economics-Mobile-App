@@ -1,67 +1,78 @@
+import 'package:app/components/modal_bottom_sheet_operations.dart';
+import 'package:app/pages/my_home_page.dart';
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const MaterialApp(
+    home: MyApp(),
+  ));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<MyApp> createState() => _MyAppState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class _MyAppState extends State<MyApp> {
+  double totalAmount = 10000;
+  List operationList = [
+    // AMOUNT, TYPE, OPERATION DATE
+    [50.0, "Withdraw", "07/24/2023"],
+    [10.0, "Insert", "06/24/2023"],
+  ];
 
-  void _incrementCounter() {
+  void addOperation(double amount, String type, String operationDate) {
     setState(() {
-      _counter++;
+      operationList.add([amount, type, operationDate]);
+      // print([amount, type, operationDate]);
+
+      if (type == "Withdraw") {
+        // WITHDRAW MONEY FROM THE TOTAL AMOUNT
+        setState(() {
+          totalAmount = totalAmount - amount;
+        });
+      } else if (type == "Insert") {
+        // INSERT MONEY FROM THE TOTAL AMOUNT
+        setState(() {
+          totalAmount = totalAmount + amount;
+        });
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
+    return MaterialApp(
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+        useMaterial3: true,
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
+      home: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+          title: const Text('Economics Mobile App'),
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
+        body: MyHomePage(
+          operationList: operationList,
+          totalAmount: totalAmount,
+        ),
+        // BOTON FLOTANTE
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            // MODAL PARA ELEGIR OPERACIÓN
+            showModalBottomSheet<void>(
+              context: context,
+              builder: (context) {
+                return ModalBottonSheetOperations(onAddOperation: addOperation);
+              },
+            );
+          },
+          tooltip: "Add an Operation",
+          child: const Icon(Icons.add),
+        ),
       ),
     );
   }
