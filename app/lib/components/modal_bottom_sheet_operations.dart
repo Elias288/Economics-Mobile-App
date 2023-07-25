@@ -1,3 +1,4 @@
+import 'package:app/utils/operations.dart';
 import 'package:flutter/material.dart';
 
 import 'add_new_operation_box.dart';
@@ -9,28 +10,16 @@ class ModalBottonSheetOperations extends StatelessWidget {
   ModalBottonSheetOperations({super.key, required this.onAddOperation});
 
   // CREATE A NEW OPERATION DIALOG
-  _addNewWithdraw(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AddNewOperation(
-          operationTitle: "a Withdraw",
-          controller: _newOperationController,
-          onSave: () => saveNewOperation(context, "Withdraw"),
-          onCancel: () => cancelNewOperation(context),
-        );
-      },
-    );
-  }
+  _addNewOperation(BuildContext context, String type) {
+    String msg = type == "Insert" ? "an Insert" : "a Withdraw";
 
-  _addNewInsert(BuildContext context) {
     showDialog(
       context: context,
       builder: (context) {
         return AddNewOperation(
-          operationTitle: "an Insert",
+          operationTitle: msg,
           controller: _newOperationController,
-          onSave: () => saveNewOperation(context, "Insert"),
+          onSave: () => saveNewOperation(context, type),
           onCancel: () => cancelNewOperation(context),
         );
       },
@@ -39,12 +28,15 @@ class ModalBottonSheetOperations extends StatelessWidget {
 
   // SAVE NEW OPERATION
   void saveNewOperation(BuildContext context, String type) {
-    // CALLBACK TO UPDATE LIST
-    onAddOperation(
-      double.parse(_newOperationController.text),
-      type,
-      "06/24/2023",
+    Operations op = Operations(
+      amount: double.parse(_newOperationController.text),
+      type: type,
+      operationDate: "06/24/2023",
     );
+
+    // CALLBACK TO UPDATE LIST
+    onAddOperation(op);
+
     _newOperationController.clear();
     Navigator.of(context).pop();
   }
@@ -65,7 +57,7 @@ class ModalBottonSheetOperations extends StatelessWidget {
           title: const Text("Add new Insert"),
           onTap: () {
             Navigator.pop(context);
-            _addNewInsert(context);
+            _addNewOperation(context, "Insert");
           },
         ),
         ListTile(
@@ -73,7 +65,7 @@ class ModalBottonSheetOperations extends StatelessWidget {
           title: const Text("Add new Withdraw"),
           onTap: () {
             Navigator.pop(context);
-            _addNewWithdraw(context);
+            _addNewOperation(context, "Withdraw");
           },
         ),
       ],
