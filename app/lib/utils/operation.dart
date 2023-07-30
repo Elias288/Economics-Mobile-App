@@ -12,7 +12,7 @@ class Operation {
   final OperationType type;
 
   @HiveField(2)
-  final String operationDate;
+  final DateTime operationDate;
 
   @HiveField(3)
   final String cause;

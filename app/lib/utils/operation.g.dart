@@ -19,7 +19,7 @@ class OperationAdapter extends TypeAdapter<Operation> {
     return Operation(
       amount: fields[0] as double,
       type: fields[1] as OperationType,
-      operationDate: fields[2] as String,
+      operationDate: fields[2] as DateTime,
       cause: fields[3] as String,
     );
   }

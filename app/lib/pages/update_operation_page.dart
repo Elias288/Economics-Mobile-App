@@ -1,6 +1,7 @@
 import 'package:app/utils/operation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:app/components/change_date_component.dart';
 
 class UpdateOperationPage extends StatefulWidget {
   final String operationTitle;
@@ -19,13 +20,21 @@ class UpdateOperationPage extends StatefulWidget {
 class _UpdateOperationPageState extends State<UpdateOperationPage> {
   final TextEditingController _amountController = TextEditingController();
   final TextEditingController _causeController = TextEditingController();
+  late DateTime updatedDate;
 
   @override
   void initState() {
     _amountController.text = widget.operation.amount.toString();
     _causeController.text = widget.operation.cause;
+    updatedDate = widget.operation.operationDate;
 
     super.initState();
+  }
+
+  void _onDateChanged(DateTime newDate) {
+    setState(() {
+      updatedDate = newDate;
+    });
   }
 
   void _updateNewOperation() {
@@ -93,7 +102,7 @@ class _UpdateOperationPageState extends State<UpdateOperationPage> {
         final newOperation = Operation(
           amount: double.parse(_amountController.text),
           type: widget.operation.type,
-          operationDate: "07/26/2023",
+          operationDate: updatedDate,
           cause: _causeController.text.trim(),
         );
 
@@ -142,32 +151,28 @@ class _UpdateOperationPageState extends State<UpdateOperationPage> {
             ),
           ),
           // date
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 30),
-            child: Row(
-              children: [
-                const Text("Date: "),
-                Text(widget.operation.operationDate),
-              ],
-            ),
+          ChangeDateComponent(
+            initialDate: updatedDate,
+            onDateChanged: _onDateChanged,
           ),
           // action buttons
           Padding(
             padding: const EdgeInsets.all(30),
             child: Row(
-              textDirection: TextDirection.rtl,
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                MaterialButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: const Text("Cancel"),
-                ),
-                MaterialButton(
+                FilledButton(
                   onPressed: () {
                     _updateNewOperation();
                   },
                   child: const Text("Save"),
+                ),
+                const SizedBox(width: 8),
+                OutlinedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text("Cancel"),
                 ),
               ],
             ),

@@ -2,6 +2,7 @@ import 'package:app/pages/update_operation_page.dart';
 import 'package:app/utils/operation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:intl/intl.dart' as intl;
 
 class InfoCard extends StatelessWidget {
   // get the operation info
@@ -106,7 +107,7 @@ class InfoCard extends StatelessWidget {
                     style: const TextStyle(
                         fontWeight: FontWeight.bold, fontSize: 20),
                   ),
-                  Text(operation.operationDate),
+                  Text(intl.DateFormat('MM/dd/yyyy').format(operation.operationDate)),
                 ],
               ),
               Text(

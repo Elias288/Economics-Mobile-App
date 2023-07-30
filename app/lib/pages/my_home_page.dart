@@ -48,7 +48,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  void openSnackbar(BuildContext context, title) {
+  void _openSnackbar(BuildContext context, title) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(title),
@@ -78,8 +78,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
       hd.updateDataBase();
       operation.type == OperationType.insert
-          ? openSnackbar(context, "Insertion Added")
-          : openSnackbar(context, "Withdrawal added");
+          ? _openSnackbar(context, "Insertion Added")
+          : _openSnackbar(context, "Withdrawal added");
     });
   }
 
@@ -97,7 +97,7 @@ class _MyHomePageState extends State<MyHomePage> {
       }
 
       hd.updateDataBase();
-      openSnackbar(context, "Operation Removed");
+      _openSnackbar(context, "Operation Removed");
     });
   }
 
@@ -120,7 +120,7 @@ class _MyHomePageState extends State<MyHomePage> {
       }
 
       hd.updateDataBase();
-      openSnackbar(context, "Operation Updated");
+      _openSnackbar(context, "Operation Updated");
     });
   }
 

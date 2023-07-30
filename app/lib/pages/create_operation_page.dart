@@ -1,7 +1,7 @@
+import 'package:app/components/change_date_component.dart';
 import 'package:app/utils/operation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:intl/intl.dart' as intl;
 
 class CreateOperationPage extends StatefulWidget {
   final String operationTitle;
@@ -21,7 +21,14 @@ class _CreateOperationPageState extends State<CreateOperationPage> {
   final _amountController = TextEditingController();
   final _causeController = TextEditingController();
 
-  String formattedDate = intl.DateFormat('MM/dd/yyyy').format(DateTime.now());
+  late DateTime nowDate;
+
+  @override
+  void initState() {
+    super.initState();
+
+    nowDate = DateTime.now();
+  }
 
   void _createNewOperation() {
     // if the amount is empty or equal to zero
@@ -61,13 +68,17 @@ class _CreateOperationPageState extends State<CreateOperationPage> {
     final newOperation = Operation(
       amount: double.parse(_amountController.text),
       type: widget.operationType,
-      operationDate: formattedDate,
+      operationDate: nowDate,
       cause: _causeController.text.trim(),
     );
 
-    if (_amountController.text.isNotEmpty && _causeController.text.isNotEmpty) {
-      Navigator.pop(context, newOperation);
-    }
+    Navigator.pop(context, newOperation);
+  }
+
+  void _onDateChanged(DateTime newDate) {
+    setState(() {
+      nowDate = newDate;
+    });
   }
 
   @override
@@ -109,32 +120,28 @@ class _CreateOperationPageState extends State<CreateOperationPage> {
             ),
           ),
           // date
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 30),
-            child: Row(
-              children: [
-                const Text("Date: "),
-                Text(formattedDate),
-              ],
-            ),
+          ChangeDateComponent(
+            initialDate: nowDate,
+            onDateChanged: _onDateChanged,
           ),
           // action buttons
           Padding(
             padding: const EdgeInsets.all(30),
             child: Row(
-              textDirection: TextDirection.rtl,
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                MaterialButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: const Text("Cancel"),
-                ),
-                MaterialButton(
+                FilledButton(
                   onPressed: () {
                     _createNewOperation();
                   },
                   child: const Text("Save"),
+                ),
+                const SizedBox(width: 8),
+                OutlinedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text("Cancel"),
                 ),
               ],
             ),
