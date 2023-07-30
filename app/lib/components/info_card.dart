@@ -1,5 +1,5 @@
 import 'package:app/pages/update_operation_page.dart';
-import 'package:app/utils/operations.dart';
+import 'package:app/utils/operation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
@@ -10,7 +10,7 @@ class InfoCard extends StatelessWidget {
   final Function onUpdateOperation;
 
   // function to remove operation
-  final Function(BuildContext)? onRemoveOperation;
+  final Function onRemoveOperation;
 
   final ValueNotifier<OperationType> _selectedType =
       ValueNotifier(OperationType.insert);
@@ -23,7 +23,7 @@ class InfoCard extends StatelessWidget {
     required this.index,
   });
 
-  void updateOperation(BuildContext context) {
+  void _updateOperation(BuildContext context) {
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -39,6 +39,29 @@ class InfoCard extends StatelessWidget {
     });
   }
 
+  void _deleteOperation(context) async {
+    showDialog<String>(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: const Text('Alert!!'),
+        content: const Text('Are you sure you want to remove the operation?'),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              onRemoveOperation(index);
+              Navigator.pop(context);
+            },
+            child: const Text('Ok'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     _selectedType.value = operation.type;
@@ -49,14 +72,14 @@ class InfoCard extends StatelessWidget {
         children: [
           // edit operation
           SlidableAction(
-            onPressed: (context) => updateOperation(context),
+            onPressed: (context) => _updateOperation(context),
             icon: Icons.edit,
             backgroundColor: Colors.blue.shade200,
             borderRadius: BorderRadius.circular(12),
           ),
           // delete operation
           SlidableAction(
-            onPressed: onRemoveOperation,
+            onPressed: _deleteOperation,
             icon: Icons.delete,
             backgroundColor: Colors.red.shade400,
             borderRadius: BorderRadius.circular(12),

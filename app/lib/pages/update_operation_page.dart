@@ -1,4 +1,4 @@
-import 'package:app/utils/operations.dart';
+import 'package:app/utils/operation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -29,16 +29,77 @@ class _UpdateOperationPageState extends State<UpdateOperationPage> {
   }
 
   void _updateNewOperation() {
-    final newOperation = Operation(
-      amount: double.parse(_amountController.text),
-      type: widget.operation.type,
-      operationDate: "07/26/2023",
-      cause: _causeController.text,
-    );
-
-    if (_amountController.text.isNotEmpty && _causeController.text.isNotEmpty) {
-      Navigator.pop(context, newOperation);
+    // if the amount is empty or equal to zero
+    if (_amountController.text.isEmpty || _amountController.text == "0") {
+      // shows the error
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: const Text("Amount cannot be empty or 0"),
+        action: SnackBarAction(
+          label: 'Close',
+          onPressed: () {},
+        ),
+        padding: const EdgeInsets.fromLTRB(15, 4, 0, 4),
+        behavior: SnackBarBehavior.floating,
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+      ));
+      // reset the initial value
+      _amountController.text = widget.operation.amount.toString();
+      return;
     }
+
+    // If the cause is empty
+    if (_causeController.text.trim().isEmpty) {
+      // shows the error
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: const Text("The cause cannot be empty"),
+        action: SnackBarAction(
+          label: 'Close',
+          onPressed: () {},
+        ),
+        padding: const EdgeInsets.fromLTRB(15, 4, 0, 4),
+        behavior: SnackBarBehavior.floating,
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+      ));
+      // reset the initial value
+      _causeController.text = widget.operation.cause;
+      return;
+    }
+
+    // validates that the user wants to modify the operation
+    showDialog<String>(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: const Text('Alert!!'),
+        content: const Text('Are you sure you want to modify the operation?'),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context, "Ok");
+            },
+            child: const Text('Ok'),
+          ),
+        ],
+      ),
+    ).then((value) {
+      // if the result of the dialog is ok
+      if (value == "Ok") {
+        // creates the new modified operation
+        final newOperation = Operation(
+          amount: double.parse(_amountController.text),
+          type: widget.operation.type,
+          operationDate: "07/26/2023",
+          cause: _causeController.text.trim(),
+        );
+
+        Navigator.pop(context, newOperation);
+      }
+    });
   }
 
   @override
@@ -78,6 +139,16 @@ class _UpdateOperationPageState extends State<UpdateOperationPage> {
               decoration: const InputDecoration(labelText: "Amount"),
               keyboardType: TextInputType.number,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            ),
+          ),
+          // date
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 30),
+            child: Row(
+              children: [
+                const Text("Date: "),
+                Text(widget.operation.operationDate),
+              ],
             ),
           ),
           // action buttons

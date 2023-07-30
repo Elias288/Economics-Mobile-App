@@ -1,10 +1,15 @@
 import 'package:app/pages/my_home_page.dart';
+import 'package:app/utils/operation.dart';
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
-void main() {
-  runApp(const MaterialApp(
-    home: MyApp(),
-  ));
+void main() async {
+  await Hive.initFlutter();
+  Hive.registerAdapter(OperationAdapter());
+  Hive.registerAdapter(OperationTypeAdapter());
+  await Hive.openBox("operationsBox");
+
+  runApp(const MaterialApp(home: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
