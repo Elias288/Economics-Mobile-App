@@ -1,26 +1,17 @@
+import 'package:app/utils/account.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:app/utils/operation.dart';
 
 class HiveData {
-  double totalAmount = 0;
-  List<Operation> operationList = [];
+  final _myAccountBox = Hive.box('accountsBox');
+  List<Account> accountList = [];
 
-  final _myBox = Hive.box('operationsBox');
-
-  void loadData() {
-    // load the operations list
-    if (_myBox.get("operations") != null) {
-      operationList = _myBox.get("operations")?.cast<Operation>() ?? [];
-    }
-
-    // load the amount
-    if (_myBox.get("totalAmount") != null) {
-      totalAmount = _myBox.get("totalAmount") ?? 0;
+  void loadAccounts() {
+    if (_myAccountBox.get("accounts") != null) {
+      accountList = _myAccountBox.get("accounts")?.cast<Account>() ?? [];
     }
   }
 
   void updateDataBase() {
-    _myBox.put("operations", operationList);
-    _myBox.put("totalAmount", totalAmount);
+    _myAccountBox.put("accounts", accountList);
   }
 }

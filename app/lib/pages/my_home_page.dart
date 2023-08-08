@@ -1,27 +1,37 @@
-import 'dart:developer';
 import 'package:app/components/modal_add_operations.dart';
-import 'package:app/components/info_card.dart';
-import 'package:app/data/hive.data.dart';
+import 'package:app/components/operation_card.dart';
 import 'package:app/pages/create_operation_page.dart';
+import 'package:app/utils/account.dart';
 import 'package:app/utils/operation.dart';
 import 'package:flutter/material.dart';
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key});
+  // selected Account
+  final Account selectedAccount;
+  final int index;
+  final Function onUpdateAccountData;
+
+  const MyHomePage({
+    super.key,
+    required this.selectedAccount,
+    required this.onUpdateAccountData,
+    required this.index,
+  });
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  HiveData hd = HiveData();
+  List<Operation> operationList = [];
+  double totalAmount = 0;
 
   @override
   void initState() {
-    hd.loadData();
-    inspect(hd.operationList);
-
     super.initState();
+
+    operationList = widget.selectedAccount.operations;
+    totalAmount = widget.selectedAccount.totalAmount;
   }
 
   void _openSelectionModal(context) async {
@@ -66,39 +76,78 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _addOperation(Operation operation) {
     setState(() {
-      hd.operationList.add(operation);
-      inspect(hd.operationList);
+      operationList.add(operation);
+
       if (operation.type == OperationType.withdraw) {
         // WITHDRAW MONEY FROM THE TOTAL AMOUNT
-        hd.totalAmount = hd.totalAmount - operation.amount;
+        totalAmount = totalAmount - operation.amount;
       } else if (operation.type == OperationType.insert) {
         // INSERT MONEY FROM THE TOTAL AMOUNT
-        hd.totalAmount = hd.totalAmount + operation.amount;
+        totalAmount = totalAmount + operation.amount;
       }
 
-      hd.updateDataBase();
+      // update the database
+      widget.onUpdateAccountData(
+        widget.index,
+        widget.selectedAccount.name,
+        operationList,
+        totalAmount,
+      );
+
       operation.type == OperationType.insert
           ? _openSnackbar(context, "Insertion Added")
           : _openSnackbar(context, "Withdrawal added");
     });
   }
 
-  void _removeOperation(int index) {
-    setState(() {
-      Operation operation = hd.operationList[index];
-      hd.operationList.removeAt(index);
+  void _removeOperation(int index) async {
+    showDialog<String>(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: const Text('Alert!!'),
+        content: const Text('Are you sure you want to remove the operation?'),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              // onRemoveOperation(index);
+              Navigator.pop(context, 'OK');
+            },
+            child: const Text('Ok'),
+          ),
+        ],
+      ),
+    ).then(
+      (value) {
+        if (value == "OK") {
+          setState(() {
+            Operation operation = operationList[index];
+            operationList.removeAt(index);
 
-      if (operation.type == OperationType.withdraw) {
-        // insert the extracted amount to the total amount
-        hd.totalAmount = hd.totalAmount + operation.amount;
-      } else if (operation.type == OperationType.insert) {
-        // withdraws the amount withdrawn in the total amount
-        hd.totalAmount = hd.totalAmount - operation.amount;
-      }
+            if (operation.type == OperationType.withdraw) {
+              // insert the extracted amount to the total amount
+              totalAmount = totalAmount + operation.amount;
+            } else if (operation.type == OperationType.insert) {
+              // withdraws the amount withdrawn in the total amount
+              totalAmount = totalAmount - operation.amount;
+            }
 
-      hd.updateDataBase();
-      _openSnackbar(context, "Operation Removed");
-    });
+            // update database
+            widget.onUpdateAccountData(
+              widget.index,
+              widget.selectedAccount.name,
+              operationList,
+              totalAmount,
+            );
+
+            _openSnackbar(context, "Operation Removed");
+          });
+        }
+      },
+    );
   }
 
   void _updateOperation(
@@ -107,19 +156,26 @@ class _MyHomePageState extends State<MyHomePage> {
     Operation previusOperation,
   ) {
     setState(() {
-      hd.operationList[index] = updatedOperation;
+      operationList[index] = updatedOperation;
 
       if (previusOperation.type == OperationType.withdraw) {
         // the previous amount is added and the new amount is subtracted.
-        hd.totalAmount =
-            hd.totalAmount + previusOperation.amount - updatedOperation.amount;
+        totalAmount =
+            totalAmount + previusOperation.amount - updatedOperation.amount;
       } else if (previusOperation.type == OperationType.insert) {
         // the previous amount is subtracted and the new amount is added.
-        hd.totalAmount =
-            hd.totalAmount - previusOperation.amount + updatedOperation.amount;
+        totalAmount =
+            totalAmount - previusOperation.amount + updatedOperation.amount;
       }
 
-      hd.updateDataBase();
+      // update database
+      widget.onUpdateAccountData(
+        widget.index,
+        widget.selectedAccount.name,
+        operationList,
+        totalAmount,
+      );
+
       _openSnackbar(context, "Operation Updated");
     });
   }
@@ -137,14 +193,12 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Divider(),
-
             // TOTAL AMOUNT
             Center(
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 50),
                 child: Text(
-                  "\$${hd.totalAmount.toString()}",
+                  "\$${totalAmount.toString()}",
                   style: const TextStyle(fontSize: 24),
                 ),
               ),
@@ -160,7 +214,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
             // LIST OF OPERATIONS
             Container(
-              child: hd.operationList.isEmpty
+              child: operationList.isEmpty
                   // IF EMPTY SHOW A MESSAGE
                   ? const Column(
                       mainAxisSize: MainAxisSize.max,
@@ -175,15 +229,15 @@ class _MyHomePageState extends State<MyHomePage> {
                   // ELSE SHOW A LIST
                   : Expanded(
                       child: ListView.builder(
-                        itemCount: hd.operationList.length,
+                        itemCount: operationList.length,
                         itemBuilder: (context, index) {
-                          Operation operation = hd.operationList[index];
-
-                          return InfoCard(
+                          Operation operation = operationList[index];
+                          return OperationCard(
                             index: index,
                             operation: operation,
-                            onRemoveOperation: (context) =>
-                                _removeOperation(index),
+                            onRemoveOperation: (context) {
+                              _removeOperation(index);
+                            },
                             onUpdateOperation: _updateOperation,
                           );
                         },
@@ -193,7 +247,6 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       ),
-
       // floating button
       floatingActionButton: FloatingActionButton(
         // open modal to select operation type

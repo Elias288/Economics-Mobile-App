@@ -8,7 +8,7 @@ part of 'operation.dart';
 
 class OperationAdapter extends TypeAdapter<Operation> {
   @override
-  final int typeId = 0;
+  final int typeId = 1;
 
   @override
   Operation read(BinaryReader reader) {
@@ -51,7 +51,7 @@ class OperationAdapter extends TypeAdapter<Operation> {
 
 class OperationTypeAdapter extends TypeAdapter<OperationType> {
   @override
-  final int typeId = 1;
+  final int typeId = 2;
 
   @override
   OperationType read(BinaryReader reader) {

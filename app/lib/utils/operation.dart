@@ -3,7 +3,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 // generate OperationAdapter: `flutter packages pub run build_runner build`
 part 'operation.g.dart';
 
-@HiveType(typeId: 0)
+@HiveType(typeId: 1)
 class Operation {
   @HiveField(0)
   final double amount;
@@ -25,7 +25,7 @@ class Operation {
   });
 }
 
-@HiveType(typeId: 1)
+@HiveType(typeId: 2)
 enum OperationType {
   @HiveField(0)
   withdraw,

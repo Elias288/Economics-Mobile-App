@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart' as intl;
 
-class InfoCard extends StatelessWidget {
+class OperationCard extends StatelessWidget {
   // get the operation info
   final Operation operation;
   final int index;
@@ -16,7 +16,7 @@ class InfoCard extends StatelessWidget {
   final ValueNotifier<OperationType> _selectedType =
       ValueNotifier(OperationType.insert);
 
-  InfoCard({
+  OperationCard({
     super.key,
     required this.operation,
     required this.onRemoveOperation,
@@ -40,29 +40,6 @@ class InfoCard extends StatelessWidget {
     });
   }
 
-  void _deleteOperation(context) async {
-    showDialog<String>(
-      context: context,
-      builder: (BuildContext context) => AlertDialog(
-        title: const Text('Alert!!'),
-        content: const Text('Are you sure you want to remove the operation?'),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              onRemoveOperation(index);
-              Navigator.pop(context);
-            },
-            child: const Text('Ok'),
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     _selectedType.value = operation.type;
@@ -80,7 +57,7 @@ class InfoCard extends StatelessWidget {
           ),
           // delete operation
           SlidableAction(
-            onPressed: _deleteOperation,
+            onPressed: (_) => onRemoveOperation(index),
             icon: Icons.delete,
             backgroundColor: Colors.red.shade400,
             borderRadius: BorderRadius.circular(12),
@@ -107,7 +84,8 @@ class InfoCard extends StatelessWidget {
                     style: const TextStyle(
                         fontWeight: FontWeight.bold, fontSize: 20),
                   ),
-                  Text(intl.DateFormat('MM/dd/yyyy').format(operation.operationDate)),
+                  Text(intl.DateFormat('MM/dd/yyyy')
+                      .format(operation.operationDate)),
                 ],
               ),
               Text(
