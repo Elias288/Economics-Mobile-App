@@ -21,36 +21,23 @@ class _CreateOperationPageState extends State<CreateOperationPage> {
   final _amountController = TextEditingController();
   final _causeController = TextEditingController();
 
-  late DateTime nowDate;
+  /// ****************************** current date ******************************
+  late DateTime currentDate;
 
   @override
   void initState() {
     super.initState();
 
-    nowDate = DateTime.now();
+    currentDate = DateTime.now();
   }
 
   void _createNewOperation() {
-    // if the amount is empty or equal to zero
-    if (_amountController.text.isEmpty || _amountController.text == "0") {
-      // shows the error
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: const Text("Amount cannot be empty or 0"),
-        action: SnackBarAction(
-          label: 'Close',
-          onPressed: () {},
-        ),
-        padding: const EdgeInsets.fromLTRB(15, 4, 0, 4),
-        behavior: SnackBarBehavior.floating,
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-      ));
-      return;
-    }
+    /* 
+    * Create a new operation, after checking that the amount is not empty or 0. 
+    */
 
-    // If the cause is empty
+    /// ***************** checks that the cause is not empty *****************
     if (_causeController.text.trim().isEmpty) {
-      // shows the error
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: const Text("The cause cannot be empty"),
         action: SnackBarAction(
@@ -65,19 +52,37 @@ class _CreateOperationPageState extends State<CreateOperationPage> {
       return;
     }
 
+    /// ******************* checks that the amount is not empty or 0 *******************
+    if (_amountController.text.isEmpty || _amountController.text == "0") {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: const Text("Amount cannot be empty or 0"),
+        action: SnackBarAction(
+          label: 'Close',
+          onPressed: () {},
+        ),
+        padding: const EdgeInsets.fromLTRB(15, 4, 0, 4),
+        behavior: SnackBarBehavior.floating,
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+      ));
+      return;
+    }
+
+    /// ************************* create new operation *************************
     final newOperation = Operation(
       amount: double.parse(_amountController.text),
       type: widget.operationType,
-      operationDate: nowDate,
+      operationDate: currentDate,
       cause: _causeController.text.trim(),
     );
 
+    /// ************ returns the new operation to the my_home page ************
     Navigator.pop(context, newOperation);
   }
 
   void _onDateChanged(DateTime newDate) {
     setState(() {
-      nowDate = newDate;
+      currentDate = newDate;
     });
   }
 
@@ -99,7 +104,7 @@ class _CreateOperationPageState extends State<CreateOperationPage> {
       body: Column(
         mainAxisSize: MainAxisSize.max,
         children: [
-          // cause input
+          /// ************************** cause input **************************
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 30),
             child: TextField(
@@ -109,7 +114,8 @@ class _CreateOperationPageState extends State<CreateOperationPage> {
                   const InputDecoration(labelText: "Cause for operation"),
             ),
           ),
-          // amount input
+
+          /// ************************** amount input **************************
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 30),
             child: TextField(
@@ -119,17 +125,20 @@ class _CreateOperationPageState extends State<CreateOperationPage> {
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             ),
           ),
-          // date
+
+          /// ************************** date picker **************************
           ChangeDateComponent(
-            initialDate: nowDate,
+            initialDate: currentDate,
             onDateChanged: _onDateChanged,
           ),
-          // action buttons
+
+          /// ************************* action buttons *************************
           Padding(
             padding: const EdgeInsets.all(30),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
+                /// *********************** save button ***********************
                 FilledButton(
                   onPressed: () {
                     _createNewOperation();
@@ -137,6 +146,8 @@ class _CreateOperationPageState extends State<CreateOperationPage> {
                   child: const Text("Save"),
                 ),
                 const SizedBox(width: 8),
+
+                /// ********************** cancel button **********************
                 OutlinedButton(
                   onPressed: () {
                     Navigator.pop(context);

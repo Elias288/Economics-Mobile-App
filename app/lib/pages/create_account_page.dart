@@ -13,12 +13,14 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
   final _nameController = TextEditingController();
   final _initialAmountController = TextEditingController();
 
+  /// ******************** create and return the newAccount ********************
   void _createNewAccount() {
     final accountName = _nameController.text.trim();
     double totalAmount = _initialAmountController.text.isNotEmpty
         ? double.parse(_initialAmountController.text)
         : 0;
-    // if the name is empty
+
+    /// ************************* if the name is empty *************************
     if (accountName.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: const Text("Account name cannot be empty"),
@@ -35,11 +37,13 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
       return;
     }
 
+    /// ************************** create newAccount **************************
     final newAccount = Account(
       name: accountName,
       totalAmount: totalAmount,
     );
 
+    /// ****************** return to init_page the newAccount ******************
     Navigator.pop(context, newAccount);
   }
 
@@ -61,7 +65,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
       body: Column(
         mainAxisSize: MainAxisSize.max,
         children: [
-          // name input
+          /// *********************** account name input ***********************
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 30),
             child: TextField(
@@ -71,7 +75,8 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                   const InputDecoration(labelText: "Name of the account*"),
             ),
           ),
-          // initialAmount input
+
+          /// ********************** initial amount input **********************
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 30),
             child: TextField(
@@ -81,17 +86,21 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             ),
           ),
-          // action buttons
+
+          /// ************************* action buttons *************************
           Padding(
             padding: const EdgeInsets.all(30.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
+                /// **************** create new account button ****************
                 FilledButton(
                   onPressed: () => _createNewAccount(),
                   child: const Text("Save"),
                 ),
                 const SizedBox(width: 8),
+
+                /// ********************** cancel button **********************
                 OutlinedButton(
                   onPressed: () => Navigator.pop(context),
                   child: const Text("Cancel"),

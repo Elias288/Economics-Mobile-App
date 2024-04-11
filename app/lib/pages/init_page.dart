@@ -38,7 +38,12 @@ class _InitPageState extends State<InitPage> {
     );
   }
 
+  /// ************* navega hacia la pagina de creación de cuentas **************
   void _createNewAccount(BuildContext context) {
+    /* 
+    * Navega hacia la pagina CreateAccountPage, toma el resultado y llama a la
+    * función _addNewAccount para crear la cuenta
+    */
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -49,6 +54,7 @@ class _InitPageState extends State<InitPage> {
     });
   }
 
+  /// ************************* agrega cuenta a la BD **************************
   void _addNewAccount(Account newAccount) {
     setState(() {
       hd.accountList.add(newAccount);
@@ -58,6 +64,7 @@ class _InitPageState extends State<InitPage> {
     _openSnackbar(context, "Account Created");
   }
 
+  /// ************************ guardar o actualizar BD *************************
   void _updateAccount(
     int index,
     String accountName,
@@ -65,6 +72,10 @@ class _InitPageState extends State<InitPage> {
     double newTotalAmount,
   ) {
     setState(() {
+      /*
+      * Recibe el indice donde se encuentra la cuenta en la base de datos, la 
+      * información nueva de la cuenta y la actualiza en la base de datos
+      */
       Account updatedAccount = Account(
         name: hd.accountList[index].name,
         totalAmount: newTotalAmount,
@@ -78,6 +89,7 @@ class _InitPageState extends State<InitPage> {
     _openSnackbar(context, "Account Updated");
   }
 
+  /// ************************ borrar cuenta de la BD *************************
   void _deleteAccount(int index) {
     showDialog<String>(
       context: context,
@@ -121,6 +133,7 @@ class _InitPageState extends State<InitPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      /// ****************************** app bar ******************************
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: const Text('Economics Mobile App'),
@@ -132,7 +145,10 @@ class _InitPageState extends State<InitPage> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Container(
+              /// ********************** list of accounts **********************
               child: hd.accountList.isEmpty
+
+                  /// ********** if there are no accounts on the list **********
                   ? const Column(
                       mainAxisSize: MainAxisSize.max,
                       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -143,6 +159,8 @@ class _InitPageState extends State<InitPage> {
                         ),
                       ],
                     )
+
+                  /// *********** if there are accounts on the list ***********
                   : Expanded(
                       child: ListView.builder(
                         itemCount: hd.accountList.length,
@@ -160,6 +178,8 @@ class _InitPageState extends State<InitPage> {
           ],
         ),
       ),
+
+      /// ************************** floating button **************************
       floatingActionButton: FloatingActionButton(
         onPressed: () => _createNewAccount(context),
         tooltip: "Add an Account",
